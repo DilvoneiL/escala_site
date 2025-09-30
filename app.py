@@ -110,3 +110,5 @@ def historico():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # pega a porta do Railway, ou usa 5000 local
+    app.run(host="0.0.0.0", port=port, debug=True)
