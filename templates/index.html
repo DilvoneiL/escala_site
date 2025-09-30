@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Escala de Limpeza</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Escala de Limpeza - Semana {{ semana }}/{{ ano }}</h1>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Tarefa</th>
+            <th>Responsável</th>
+            <th>Status</th>
+        </tr>
+        {% for id, tarefa, responsavel, status in tabela %}
+        <tr class="{% if status == 'feita' %}feito{% endif %}">
+            <td>{{ loop.index }}</td>
+            <td>{{ tarefa }}</td>
+            <td>{{ responsavel }}</td>
+            <td>
+                {% if status == 'pendente' %}
+                    <a href="/fazer/{{ id }}">✅ Marcar feita</a>
+                {% else %}
+                    Feita
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/historico">📜 Ver Histórico</a>
+</body>
+</html>

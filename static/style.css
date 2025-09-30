@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f4f6f8;
+}
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+    width: 90%;
+}
+
+th, td {
+    border: 1px solid #999;
+    padding: 10px;
+}
+
+th {
+    background: #007BFF;
+    color: white;
+}
+
+tr.feito {
+    background: #d4edda;
+    color: #155724;
+    text-decoration: line-through;
+}

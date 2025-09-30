@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Limpeza</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>📜 Histórico de Tarefas</h1>
+    <table>
+        <tr>
+            <th>Semana</th>
+            <th>Ano</th>
+            <th>Tarefa</th>
+            <th>Responsável</th>
+            <th>Status</th>
+        </tr>
+        {% for semana, ano, tarefa, responsavel, status in dados %}
+        <tr class="{% if status == 'feita' %}feito{% endif %}">
+            <td>{{ semana }}</td>
+            <td>{{ ano }}</td>
+            <td>{{ tarefa }}</td>
+            <td>{{ responsavel }}</td>
+            <td>{{ status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/">⬅ Voltar para Escala Atual</a>
+</body>
+</html>
