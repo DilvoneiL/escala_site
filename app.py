@@ -79,7 +79,7 @@ def escala_atual():
     semana = hoje.isocalendar()[1]
     ano = hoje.isocalendar()[0]
 
-    rotacao = (semana*2) % len(responsaveis_base)
+    rotacao = (semana*-2) % len(responsaveis_base)
     responsaveis = responsaveis_base[rotacao:] + responsaveis_base[:rotacao]
     
 
