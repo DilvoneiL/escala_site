@@ -5,6 +5,27 @@ import os
 
 app = Flask(__name__)
 
+# --- INÍCIO DA MODIFICAÇÃO PARA O RAILWAY ---
+
+def get_db_path():
+    """
+    Retorna o caminho correto para o banco de dados.
+    No Railway, ele usa o caminho do volume persistente.
+    Localmente, ele usa o arquivo 'tarefas.db' na pasta do projeto.
+    """
+    volume_path = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH')
+    if volume_path:
+        # Garante que o diretório do volume existe
+        os.makedirs(volume_path, exist_ok=True)
+        # Caminho do banco de dados dentro do volume
+        return os.path.join(volume_path, 'tarefas.db')
+    else:
+        # Caminho para rodar localmente
+        return 'tarefas.db'
+
+# --- FIM DA MODIFICAÇÃO PARA O RAILWAY ---
+
+
 # Lista fixa de tarefas
 tarefas = [
     "Cozinha Cima",
@@ -32,7 +53,7 @@ GATILHO_DO_CICLO = set(responsaveis_base[-4:-2])
 
 # ---------- BANCO DE DADOS ----------
 def init_db():
-    conn = sqlite3.connect("tarefas.db")
+    conn = sqlite3.connect(get_db_path()) # MODIFICADO
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS historico (
@@ -48,7 +69,7 @@ def init_db():
     conn.close()
 
 def registrar_tarefas(semana, ano, tabela):
-    conn = sqlite3.connect("tarefas.db")
+    conn = sqlite3.connect(get_db_path()) # MODIFICADO
     cur = conn.cursor()
     for _, tarefa, responsavel in tabela:
         cur.execute("INSERT INTO historico (semana, ano, tarefa, responsavel, status) VALUES (?, ?, ?, ?, ?)",
@@ -57,7 +78,7 @@ def registrar_tarefas(semana, ano, tabela):
     conn.close()
 
 def buscar_tarefas(semana, ano):
-    conn = sqlite3.connect("tarefas.db")
+    conn = sqlite3.connect(get_db_path()) # MODIFICADO
     cur = conn.cursor()
     cur.execute("SELECT id, tarefa, responsavel, status FROM historico WHERE semana=? AND ano=?", (semana, ano))
     rows = cur.fetchall()
@@ -65,14 +86,14 @@ def buscar_tarefas(semana, ano):
     return rows
 
 def atualizar_status(id_tarefa, status):
-    conn = sqlite3.connect("tarefas.db")
+    conn = sqlite3.connect(get_db_path()) # MODIFICADO
     cur = conn.cursor()
     cur.execute("UPDATE historico SET status=? WHERE id=?", (status, id_tarefa))
     conn.commit()
     conn.close()
 
 def buscar_historico():
-    conn = sqlite3.connect("tarefas.db")
+    conn = sqlite3.connect(get_db_path()) # MODIFICADO
     cur = conn.cursor()
     cur.execute("SELECT semana, ano, tarefa, responsavel, status FROM historico ORDER BY ano DESC, semana DESC")
     rows = cur.fetchall()
@@ -109,7 +130,14 @@ def escala_atual():
 
     tabela = list(zip(range(1, len(tarefas)+1), tarefas, responsaveis))
 
-    if not buscar_tarefas(semana, ano):
+    # Conecta usando o caminho correto para buscar as tarefas
+    conn = sqlite3.connect(get_db_path())
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM historico WHERE semana=? AND ano=?", (semana, ano))
+    existe = cur.fetchone()
+    conn.close()
+
+    if not existe:
         registrar_tarefas(semana, ano, tabela)
 
     return semana, ano, buscar_tarefas(semana, ano)
